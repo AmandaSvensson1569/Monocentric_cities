@@ -12,12 +12,12 @@ import matplotlib.pyplot as plt
 JOBS_FILE = "input/pop-act2554-empl-csp-cd-trav-6822.xlsx"
 RESIDENTS_FILE = "input/pop-act2554-empl-sexe-cd-6822.xlsx"
 
-YEARS = [1968, 1975, 1982, 1990, 1999, 2006, 2011, 2016, 2022]  # census years
+YEARS = [1968, 1975, 1982, 1990, 1999, 2006, 2011, 2016, 2022]
 CENTRE = (45.7640, 4.8357)  # Place Bellecour
 
 
 def distance_km(lat, lon):
-    # haversine formula, distance from CENTRE in km
+    # Calculate distance from Place Bellecour in km
     lat0, lon0 = np.radians(CENTRE[0]), np.radians(CENTRE[1])
     lat, lon = np.radians(lat), np.radians(lon)
     a = np.sin((lat - lat0) / 2) ** 2 + np.cos(lat0) * np.cos(lat) * np.sin((lon - lon0) / 2) ** 2
@@ -25,6 +25,7 @@ def distance_km(lat, lon):
 
 
 def load_jobs(year):
+    # Load jobs by workplace commune
     df = pd.read_excel(JOBS_FILE, sheet_name=f"COM_{year}", skiprows=14)
     df = df[df["DLT"].astype(str) == "69"].copy()
     df["CODGEO"] = "69" + df["CLT"].astype(str).str.zfill(3)
@@ -34,6 +35,7 @@ def load_jobs(year):
 
 
 def load_residents(year):
+    # Load employed residents by home commune
     df = pd.read_excel(RESIDENTS_FILE, sheet_name=f"COM_{year}", skiprows=15)
     df = df[df["DR"].astype(str) == "69"].copy()
     df["CODGEO"] = "69" + df["CR"].astype(str).str.zfill(3)
@@ -42,14 +44,18 @@ def load_residents(year):
     return df[["CODGEO", "residents"]].dropna()
 
 
+# Load commune coordinates
 coords = pd.read_csv("input/coordinates.csv", dtype={"CODGEO": str})
 os.makedirs("output", exist_ok=True)
 
 rows = []
+
 for year in YEARS:
+    # Combine jobs, residents and coordinates
     df = load_jobs(year).merge(load_residents(year), on="CODGEO").merge(coords, on="CODGEO")
     df["dist"] = distance_km(df["lat"], df["lon"])
 
+    # Calculate the share of jobs and residents within 5 and 10 km
     for r in [5, 10]:
         near = df[df["dist"] <= r]
         rows.append([year, r,
@@ -63,7 +69,7 @@ res = pd.DataFrame(rows, columns=["year", "radius_km", "jobs_pct", "residents_pc
 res.to_csv("output/lyon_trend_data.csv", index=False)
 print(res.to_string(index=False))
 
-# trend graph (5 km)
+# Trend graph for the 5 km radius
 r5 = res[res["radius_km"] == 5]
 plt.figure(figsize=(7, 5))
 plt.plot(r5["year"], r5["jobs_pct"], "o-", label="Jobs")
@@ -76,7 +82,7 @@ plt.grid(alpha=0.3)
 plt.savefig("output/lyon_trend.png", dpi=150, bbox_inches="tight")
 plt.close()
 
-# cumulative graph 2022
+# Cumulative graph for 2022
 plt.figure(figsize=(7, 5))
 plt.plot(df_2022["dist"], 100 * df_2022["jobs"].cumsum() / df_2022["jobs"].sum(), label="Jobs")
 plt.plot(df_2022["dist"], 100 * df_2022["residents"].cumsum() / df_2022["residents"].sum(), label="Employed residents")
