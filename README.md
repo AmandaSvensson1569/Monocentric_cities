@@ -18,8 +18,8 @@ We compare the share of jobs and employed residents within different distances f
 | `coordinates.csv` | Coordinates of each commune, made by `get_coordinates.py` | [API Geo](https://geo.api.gouv.fr) |
 | `paris_boundaries.geojson`, `lyon_boundaries.geojson` | Commune borders for the maps, made by `fetch_map_boundaries.py` | [IGN GEOFLA](https://geoservices.ign.fr/geofla) |
 
-We only use ages 25-54 because it is the only age group INSEE has made
-comparable across all 9 censuses.
+We only use ages 25-54 because this is the only age group that can be compared across all years.
+
 
 ## Folders
 
