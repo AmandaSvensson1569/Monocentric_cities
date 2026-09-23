@@ -1,0 +1,6 @@
+__pycache__/
+.ipynb_checkpoints/
+geofla_temp/
+commune.7z
+*.zip
+~$*
