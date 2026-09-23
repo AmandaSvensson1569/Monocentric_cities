@@ -27,6 +27,7 @@ CENTRE_LAT, CENTRE_LON = 48.8583, 2.3470  # Chatelet
 
 
 def haversine_km(lat1, lon1, lat2, lon2):
+    # Calculate distance between two points in km
     R = 6371
     p1, p2 = np.radians(lat1), np.radians(lat2)
     dphi = np.radians(lat2 - lat1)
@@ -36,45 +37,68 @@ def haversine_km(lat1, lon1, lat2, lon2):
 
 
 def load_jobs(year):
+    # Load jobs for one census year
     df = pd.read_excel(JOBS_FILE, sheet_name=f"COM_{year}", skiprows=14)
     df["DLT"] = df["DLT"].astype(str).str.zfill(2)
     df["CLT"] = df["CLT"].astype(str).str.zfill(3)
     df = df[df["DLT"].isin(PARIS_DEPARTMENTS)].copy()
+
+    # Add the 6 job categories to get total jobs
     job_category_columns = [c for c in df.columns if str(c).startswith("csx_rec")]
-    # skipna=False so a commune missing data (didn't exist that year) becomes
-    # NaN and gets dropped, instead of silently counting as 0 jobs
     df["jobs"] = df[job_category_columns].sum(axis=1, skipna=False)
+
+    # Create the commune ID used to merge the datasets
     df["CODGEO"] = df["DLT"] + df["CLT"]
     return df[["CODGEO", "jobs"]].dropna()
 
 
 def load_residents(year):
+    # Load employed residents for one census year
     df = pd.read_excel(RESIDENTS_FILE, sheet_name=f"COM_{year}", skiprows=15)
     df["DR"] = df["DR"].astype(str).str.zfill(2)
     df["CR"] = df["CR"].astype(str).str.zfill(3)
     df = df[df["DR"].isin(PARIS_DEPARTMENTS)].copy()
-    employed_columns = [c for c in df.columns if "taxtypac_rec1" in str(c)]  # rec1 = employed, rec2 = unemployed
+
+    # Select the columns for employed residents
+    employed_columns = [c for c in df.columns if "taxtypac_rec1" in str(c)]
     df["residents"] = df[employed_columns].sum(axis=1, skipna=False)
+
     df["CODGEO"] = df["DR"] + df["CR"]
     return df[["CODGEO", "residents"]].dropna()
 
 
-coordinates = pd.read_csv("input/coordinates.csv", dtype={"CODGEO": str})[["CODGEO", "lon", "lat"]].drop_duplicates("CODGEO")
+coordinates = pd.read_csv(
+    "input/coordinates.csv",
+    dtype={"CODGEO": str}
+)[["CODGEO", "lon", "lat"]].drop_duplicates("CODGEO")
+
 os.makedirs("output", exist_ok=True)
 
 results = []
-data_by_year = {}  # kept so we can reuse 2022 for the second graph below
+data_by_year = {}
 
 for year in CENSUS_YEARS:
-    df = load_jobs(year).merge(load_residents(year), on="CODGEO").merge(coordinates, on="CODGEO", how="left")
+    # Combine jobs, residents and coordinates
+    df = (
+        load_jobs(year)
+        .merge(load_residents(year), on="CODGEO")
+        .merge(coordinates, on="CODGEO", how="left")
+    )
+
+    # Calculate distance from each commune to Chatelet
     df = df.dropna(subset=["lat", "lon"])
-    df["distance_km"] = haversine_km(CENTRE_LAT, CENTRE_LON, df["lat"], df["lon"])
+    df["distance_km"] = haversine_km(
+        CENTRE_LAT, CENTRE_LON, df["lat"], df["lon"]
+    )
     data_by_year[year] = df
 
     total_jobs = df["jobs"].sum()
     total_residents = df["residents"].sum()
+
     for radius in ALL_RADII_KM:
+        # Select communes within 5 or 10 km of the centre
         nearby = df[df["distance_km"] <= radius]
+
         results.append({
             "year": year,
             "radius_km": radius,
@@ -82,12 +106,15 @@ for year in CENSUS_YEARS:
             "residents_pct": round(100 * nearby["residents"].sum() / total_residents, 1),
         })
 
+
 results_df = pd.DataFrame(results)
 results_df.to_csv("output/paris_trend_data.csv", index=False)
 print(results_df.to_string(index=False))
 
-# graph 1: share within RADIUS_TO_PLOT_KM, across all years
+
+# Graph 1: share within 5 km across all census years
 subset = results_df[results_df["radius_km"] == RADIUS_TO_PLOT_KM].sort_values("year")
+
 fig, ax = plt.subplots(figsize=(7, 5))
 ax.plot(subset["year"], subset["jobs_pct"], marker="o", linewidth=2, label="Jobs")
 ax.plot(subset["year"], subset["residents_pct"], marker="s", linewidth=2, label="Employed residents")
@@ -96,10 +123,12 @@ ax.set_ylabel(f"Share within {RADIUS_TO_PLOT_KM} km of centre (%)")
 ax.set_title("Paris: jobs vs. residents near the centre, 1968-2022")
 ax.legend()
 ax.grid(True, alpha=0.3)
+
 plt.savefig("output/paris_trend.png", dpi=150, bbox_inches="tight")
 plt.close()
 
-# graph 2: full cumulative curve for the most recent year (2022)
+
+# Graph 2: cumulative share by distance for 2022
 latest = data_by_year[2022].sort_values("distance_km").copy()
 latest["cumulative_jobs_pct"] = 100 * latest["jobs"].cumsum() / latest["jobs"].sum()
 latest["cumulative_residents_pct"] = 100 * latest["residents"].cumsum() / latest["residents"].sum()
@@ -112,6 +141,7 @@ ax.set_ylabel("Cumulative share (%)")
 ax.set_title("Paris 2022: cumulative share of jobs vs. employed residents, by distance from centre")
 ax.legend()
 ax.grid(True, alpha=0.3)
+
 plt.savefig("output/paris_cumulative_2022.png", dpi=150, bbox_inches="tight")
 
 print("Saved: output/paris_trend.png")
