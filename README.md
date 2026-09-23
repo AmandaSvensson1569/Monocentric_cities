@@ -29,7 +29,7 @@ We only use ages 25-54 because this is the only age group that can be compared a
 
 ## How to run
 
-Run everything from the main project folder (not from inside `do/`):
+Run everything from the main project folder:
 
 ```
 pip install -r do/requirements.txt
