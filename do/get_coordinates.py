@@ -1,6 +1,6 @@
 # Gets coordinates (lon/lat) for all communes in the Paris and Lyon regions
-# from API Geo (geo.api.gouv.fr) and saves them to input/coordinates.csv.
-# The INSEE files have no coordinates, and we need them to compute distance to the centre.
+# from API Geo and saves them to input/coordinates.csv.
+# We need the coordinates to calculate the distance to the city centre.
 
 import pandas as pd
 import requests
@@ -18,14 +18,14 @@ rows = []
 for dep in departments:
     communes = get_json(f"https://geo.api.gouv.fr/departements/{dep}/communes?fields=code,centre")
     for c in communes:
-        if c.get("centre") is None:  # a few communes have no centre point
+        if c.get("centre") is None:  # Some communes have no centre point
             continue
         lon, lat = c["centre"]["coordinates"]
         rows.append({"CODGEO": c["code"], "lon": lon, "lat": lat})
     print(dep, "-", len(communes), "communes")
 
-# the API gives Paris as one single commune (75056), but the INSEE job data
-# splits Paris into its 20 districts (75101-75120), so we need those too
+# Paris is one commune in the API (75056), but the INSEE data
+# has Paris split into 20 districts (75101-75120), so we need these too
 districts = get_json("https://geo.api.gouv.fr/communes?codeParent=75056"
                      "&type=arrondissement-municipal&fields=code,centre")
 for d in districts:
