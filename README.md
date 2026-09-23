@@ -55,10 +55,7 @@ Run the scripts in this order. The analysis scripts need `coordinates.csv` from
 
 ## Output
 
-- `*_cumulative_2022.png` : share of jobs and residents reached as you move
-  away from the centre. If the jobs line is above the residents line, jobs
-  are more concentrated.
-- `*_trend.png` : share within 5 km of the centre, 1968-2022
-- `*_trend_data.csv` : the numbers behind the trend graph (5 and 10 km)
-- `*_job_density_map.png` : jobs per km2, on a log scale since the centre
-  has far more jobs than everywhere else
+`<city>_cumulative_2022.png` : share of jobs and residents reached as you move away from the centre. If the jobs line is above the residents line, jobs are more concentrated.
+`<city>_job_density_map.png` : jobs per km2, on a log scale since the centre has far more jobs than everywhere else.
+`<city>_trend.png` : share within 5 km of the centre, 1968-2022
+`<city>_trend_data.csv` : the numbers behind the trend graph (5 and 10 km)
