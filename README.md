@@ -23,9 +23,9 @@ comparable across all 9 censuses.
 
 ## Folders
 
-- `do/` - the scripts
-- `input/` - the data
-- `output/` - graphs and result tables
+- `do/` : the scripts
+- `input/` : the data
+- `output/` : graphs and result tables
 
 ## How to run
 
@@ -42,25 +42,24 @@ python do/map_job_density.py
 
 The order matters. The analysis scripts need `coordinates.csv` from
 `get_coordinates.py`, and the map script needs the `.geojson` files from
-`fetch_map_boundaries.py`. Those two download scripts need internet and
-only have to be run once, the rest works offline.
+`fetch_map_boundaries.py`. 
 
 ## What each script does
 
-- `get_coordinates.py` - downloads the coordinates of all communes
-- `paris_analysis.py` - Paris: share of jobs and residents within 5 and
+- `get_coordinates.py` : downloads the coordinates of all communes
+- `paris_analysis.py` : Paris: share of jobs and residents within 5 and
   10 km of the centre for each census year, plus a cumulative curve for 2022
-- `lyon_analysis.py` - the same for Lyon (Lyon is only one row in the
+- `lyon_analysis.py` : the same for Lyon (Lyon is only one row in the
   data, so we can't look inside the city, only Lyon vs. its suburbs)
-- `fetch_map_boundaries.py` - downloads commune borders for the maps
-- `map_job_density.py` - maps of jobs per km2 in 2022
+- `fetch_map_boundaries.py` : downloads commune borders for the maps
+- `map_job_density.py` : maps of jobs per km2 in 2022
 
 ## Output
 
-- `*_cumulative_2022.png` - share of jobs and residents reached as you move
+- `*_cumulative_2022.png` : share of jobs and residents reached as you move
   away from the centre. If the jobs line is above the residents line, jobs
   are more concentrated.
-- `*_trend.png` - share within 5 km of the centre, 1968-2022
-- `*_trend_data.csv` - the numbers behind the trend graph (5 and 10 km)
-- `*_job_density_map.png` - jobs per km2, on a log scale since the centre
+- `*_trend.png` : share within 5 km of the centre, 1968-2022
+- `*_trend_data.csv` : the numbers behind the trend graph (5 and 10 km)
+- `*_job_density_map.png` : jobs per km2, on a log scale since the centre
   has far more jobs than everywhere else
