@@ -40,15 +40,14 @@ python do/fetch_map_boundaries.py
 python do/map_job_density.py
 ```
 
-The order matters. The analysis scripts need `coordinates.csv` from
+Run the scripts in this order. The analysis scripts need `coordinates.csv` from
 `get_coordinates.py`, and the map script needs the `.geojson` files from
 `fetch_map_boundaries.py`. 
 
 ## What each script does
 
 - `get_coordinates.py` : downloads the coordinates of all communes
-- `paris_analysis.py` : Paris: share of jobs and residents within 5 and
-  10 km of the centre for each census year, plus a cumulative curve for 2022
+- `paris_analysis.py` : Paris: share of jobs and  residents within 5 and 10 km of the centre for 9 years between 1968 and 2022, plus a cumulative curve for 2022
 - `lyon_analysis.py` : the same for Lyon (Lyon is only one row in the
   data, so we can't look inside the city, only Lyon vs. its suburbs)
 - `fetch_map_boundaries.py` : downloads commune borders for the maps
