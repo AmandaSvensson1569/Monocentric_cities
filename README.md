@@ -5,9 +5,9 @@ Group project for the course Urban and Real Estate Economics.
 We look at whether jobs are more concentrated near the city centre than
 employed residents are. If they are, this supports the monocentric city
 model. If jobs and residents are spread out in a similar way, the city
-may be more polycentric. We compare the share of jobs and of employed
-residents within different distances from the centre (Chatelet for
-Paris, Bellecour for Lyon), for every census year from 1968 to 2022.
+may be more polycentric. 
+We compare the share of jobs and employed residents within different distances from the centre (Chatelet for Paris, Bellecour for Lyon), for different years from 1968 to 2022.
+
 
 ## Data
 
