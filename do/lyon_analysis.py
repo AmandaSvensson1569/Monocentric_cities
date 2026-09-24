@@ -13,11 +13,11 @@ JOBS_FILE = "input/pop-act2554-empl-csp-cd-trav-6822.xlsx"
 RESIDENTS_FILE = "input/pop-act2554-empl-sexe-cd-6822.xlsx"
 
 YEARS = [1968, 1975, 1982, 1990, 1999, 2006, 2011, 2016, 2022]
-CENTRE = (45.7640, 4.8357)  # Place Bellecour
+CENTRE = (45.7640, 4.8357)  # CENTRE = (45.7640, 4.8357)  # central point in Lyon, about 700 m north of Place Bellecour
 
 
 def distance_km(lat, lon):
-    # Calculate distance from Place Bellecour in km
+    # Calculate distance from the Lyon centre point in km
     lat0, lon0 = np.radians(CENTRE[0]), np.radians(CENTRE[1])
     lat, lon = np.radians(lat), np.radians(lon)
     a = np.sin((lat - lat0) / 2) ** 2 + np.cos(lat0) * np.cos(lat) * np.sin((lon - lon0) / 2) ** 2
