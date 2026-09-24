@@ -25,7 +25,7 @@ def draw_map(city, borders_file):
     # Lyon is 9 districts on the map but only one row (69123) in the jobs file,
     # so we join the 9 district shapes into one before matching
     if city == "lyon":
-        is_lyon = gdf["NOM_COMM"].str.contains("Lyon", case=False, na=False)
+        is_lyon = gdf["CODGEO"].between("69381", "69389")
         lyon_whole = gdf[is_lyon].dissolve()
         lyon_whole["CODGEO"] = "69123"
         lyon_whole["SUPERFICIE"] = gdf.loc[is_lyon, "SUPERFICIE"].sum()
